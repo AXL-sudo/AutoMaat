@@ -92,53 +92,43 @@
 </div>
 
 <script> //API-Verbindung. Keine Ahnung wie das funzt :D
+   const API_BASE_URL = 'https://measured-superb-mayfly.ngrok-free.app/';
+    
     document.getElementById('nameForm').addEventListener('submit', async function(e) {
-        e.preventDefault(); // Verhindert das normale Form-Submit
-
+        e.preventDefault();
         const nameInput = document.getElementById('name');
         const resultDiv = document.getElementById('result');
         const name = nameInput.value.trim();
-
+        
         if (!name) {
             alert('Bitte gib einen Namen ein!');
             return;
         }
-
-        // Loading-Anzeige
+        
         resultDiv.style.display = 'block';
         resultDiv.innerHTML = '<span class="loading">Lade...</span>';
         resultDiv.style.backgroundColor = '#f8f9fa';
         resultDiv.style.color = '#666';
-
+        
         try {
-            // Request an das Backend
-            const response = await fetch(`/api/greeting?name=${encodeURIComponent(name)}`);
-
+            // Hier die geänderte URL
+            const response = await fetch(`${API_BASE_URL}/api/greeting?name=${encodeURIComponent(name)}`);
+            
             if (!response.ok) {
                 throw new Error('Fehler beim Laden der Daten');
             }
-
             const data = await response.json();
-
-            // Erfolgreiche Antwort anzeigen
             resultDiv.innerHTML = data.content;
             resultDiv.style.backgroundColor = '#d4edda';
             resultDiv.style.color = '#155724';
-
         } catch (error) {
-            // Fehler anzeigen
             resultDiv.innerHTML = 'Fehler: Konnte keine Verbindung zum Server herstellen.';
             resultDiv.style.backgroundColor = '#f8d7da';
             resultDiv.style.color = '#721c24';
         }
     });
-
-    // Enter-Taste unterstützen
-    document.getElementById('name').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('nameForm').dispatchEvent(new Event('submit'));
-        }
-    });
+    
+    
 </script>
 </body>
 </html>
