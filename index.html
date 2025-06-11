@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greeting App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            font-size: 20px;
+            color: #155724;
+            display: none;
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<h1>Greeting Generator</h1>
+
+<div class="form-container">
+    <form id="nameForm">
+        <label for="name">Wie heißt du?</label>
+        <input type="text" id="name" name="name" placeholder="Gib deinen Namen ein..." required>
+        <button type="submit">Abschicken</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script> //API-Verbindung. Keine Ahnung wie das funzt :D
+    document.getElementById('nameForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Verhindert das normale Form-Submit
+
+        const nameInput = document.getElementById('name');
+        const resultDiv = document.getElementById('result');
+        const name = nameInput.value.trim();
+
+        if (!name) {
+            alert('Bitte gib einen Namen ein!');
+            return;
+        }
+
+        // Loading-Anzeige
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<span class="loading">Lade...</span>';
+        resultDiv.style.backgroundColor = '#f8f9fa';
+        resultDiv.style.color = '#666';
+
+        try {
+            // Request an das Backend
+            const response = await fetch(`/api/greeting?name=${encodeURIComponent(name)}`);
+
+            if (!response.ok) {
+                throw new Error('Fehler beim Laden der Daten');
+            }
+
+            const data = await response.json();
+
+            // Erfolgreiche Antwort anzeigen
+            resultDiv.innerHTML = data.content;
+            resultDiv.style.backgroundColor = '#d4edda';
+            resultDiv.style.color = '#155724';
+
+        } catch (error) {
+            // Fehler anzeigen
+            resultDiv.innerHTML = 'Fehler: Konnte keine Verbindung zum Server herstellen.';
+            resultDiv.style.backgroundColor = '#f8d7da';
+            resultDiv.style.color = '#721c24';
+        }
+    });
+
+    // Enter-Taste unterstützen
+    document.getElementById('name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('nameForm').dispatchEvent(new Event('submit'));
+        }
+    });
+</script>
+</body>
+</html>
